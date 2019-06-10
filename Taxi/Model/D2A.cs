@@ -12,7 +12,7 @@ namespace Taxi.Model
 		public int		Id;
 		public Car		Auto;
 		public Driver	Driver;
-
+		public DateTime Date;
 		public override string ToString()
 		{
 			return $"{Auto.Mark} {Auto.Model} - {Driver.Name}";

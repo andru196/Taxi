@@ -45,11 +45,11 @@ namespace Taxi.DataBase
 			var sqlCommand = new SqlCommand("NewOrder", new SqlConnection(connectionString));
 			sqlCommand.CommandType = CommandType.StoredProcedure;
 
-			sqlCommand.Parameters.Add("@name", SqlDbType.NChar, 0, "CUstomer Name");
-			sqlCommand.Parameters.Add("@phone", SqlDbType.NChar, 11, "Customer Phone");
-			sqlCommand.Parameters.Add("@idd2a", SqlDbType.Int, 0, "Id");
-			sqlCommand.Parameters.Add("@From", SqlDbType.Int, 0, "From");
-			sqlCommand.Parameters.Add("@To", SqlDbType.Int, 0, "To");
+			sqlCommand.Parameters.Add("@name", SqlDbType.NChar, 0, "Customer Name");
+			sqlCommand.Parameters.Add("@phone", SqlDbType.NChar, 11, "Phone");
+			sqlCommand.Parameters.Add("@idd2a", SqlDbType.Int, 0, "D2A");
+			sqlCommand.Parameters.Add("@From", SqlDbType.NChar, 0, "AdressFrom");
+			sqlCommand.Parameters.Add("@To", SqlDbType.NChar, 0, "AdressTo");
 			SqlParameter param = new SqlParameter("@price", SqlDbType.Money);
 			param.SourceColumn = "Price";
 			sqlCommand.Parameters.Add(param);

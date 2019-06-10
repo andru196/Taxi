@@ -10,12 +10,11 @@ namespace Taxi.Model.Order
 	public class Order
 	{
 		public int					Id;
-		public Driver 				Driver;
+		public D2A 					d2a;
 		public Customer				Customer;
 		public Way					Way;
-		public Car					Car;
-		public readonly DateTime	Date;
 		public decimal				Price;
+		public string				xml;
 		/// <summary>
 		/// Конструктор экземпляра заказа
 		/// </summary>
@@ -26,15 +25,14 @@ namespace Taxi.Model.Order
 		/// <param name="cu">Экземпляр класса заказчик</param>
 		/// <param name="d">Экземпляр класса водитель</param>
 		/// <param name="dt">Дата заказа</param>
-		public Order(int i, decimal p, Way w, Car c, Customer cu, Driver d, DateTime dt)
+		public Order(int i, decimal p, Way w,  Customer cu, D2A d2, string x = "")
 		{
 			this.Id = i;
 			this.Price = p;
 			this.Way = w;
-			this.Car = c;
+			this.d2a = d2;
 			this.Customer = cu;
-			this.Driver = d;
-			this.Date = dt;
+			this.xml = x;
 		}
 		public Order(){ }
 	}

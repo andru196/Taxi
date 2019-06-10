@@ -1,5 +1,23 @@
 ﻿<%@ Page Title="Меню диспетчера" ValidateRequest="false" Language="C#" MasterPageFile="~/Site.Master" AutoEventWireup="true" CodeBehind="Default.aspx.cs" Inherits="Taxi._Default" %>
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
+        <script>
+            $(document).ready(function () {
+                $("#<%= newIdInput.ClientID%>").attr('readonly', true);
+            $("#<%= addOrd.ClientID%>").attr('disabled', true);
+        });
+            function checkParams() {
+                var From = $('#MainContent_newFrom').val();
+                var To = $('#MainContent_newTo').val();
+                var phone = $('#MainContent_newPhone').val();
+                var name = $('#MainContent_newName').val();
+
+                if (name.length != 0 && From.length != 0 && phone.length != 0 && To.length != 0) {
+                    $('#MainContent_addOrd').removeAttr('disabled');
+                } else {
+                    $('#MainContent_addOrd').attr('disabled', 'disabled');
+                }
+            }
+    </script>
     <div class="jumbotron">
 
 
@@ -15,12 +33,12 @@
                             <asp:ListItem Value="1">Создать </asp:ListItem>
                             <asp:ListItem Value="2">Редактировать</asp:ListItem>
                         </asp:DropDownList></td>
-                <td><asp:TextBox runat="server"  ID="newIdInput"></asp:TextBox></td>
+                <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newIdInput"></asp:TextBox></td>
                 <td colspan="2">           
                         <asp:DropDownList runat="server" ID="newd2a">
                            
                         </asp:DropDownList></td>
-                <td><asp:TextBox runat="server"  ID="newPrice"></asp:TextBox></td>
+                <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newPrice"></asp:TextBox></td>
                     </tr>
             <thead>
                 <tr>
@@ -28,10 +46,10 @@
                 </tr>
             </thead>
             <tr>
-                 <td><asp:TextBox runat="server"  ID="newFrom"></asp:TextBox></td>
-                 <td><asp:TextBox runat="server"  ID="newTo"></asp:TextBox></td>
-                 <td><asp:TextBox runat="server"  ID="newPhone"></asp:TextBox></td>
-                 <td><asp:TextBox runat="server"  ID="newName"></asp:TextBox></td>
+                 <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newFrom"></asp:TextBox></td>
+                 <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newTo"></asp:TextBox></td>
+                 <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newPhone"></asp:TextBox></td>
+                 <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newName"></asp:TextBox></td>
                 <td><asp:Button runat="server" Text="Сохранить" OnClick="btnAddNewOrder" ID="addOrd"/></td>
             </tr>
         </table>
@@ -68,8 +86,8 @@
                 %>
                     <tr>
                         
-                        <td><%= order.Id %></td><td><%= order.Customer.ToString("<br>") %></td><td><%= order?.Car?.ToString("<br>") %></td>
-                        <td><%= order?.Driver?.ToString("<br>") %></td><td><%= order.Way.ToString("<br>") %></td><td><%= order.Date.ToShortDateString() %></td>
+                        <td><%= order.Id %></td><td><%= order.Customer.ToString("<br>") %></td><td><%= order?.d2a.Auto?.ToString("<br>") %></td>
+                        <td><%= order?.d2a?.Driver?.ToString("<br>") %></td><td><%= order.Way.ToString("<br>") %></td><td><%= order?.d2a.Date.ToShortDateString() %></td>
                     
                       
                         </tr>
@@ -79,6 +97,16 @@
                 %>
             </tbody>
         </table>
+        <asp:Table id="tbl_footer" runat="server" Visible="false" >
+            <asp:TableRow>
+                <asp:TableCell>Водитель</asp:TableCell><asp:TableCell>Количество поездок</asp:TableCell>
+                <asp:TableCell>Среднее количество поездок</asp:TableCell><asp:TableCell>xml</asp:TableCell>
+            </asp:TableRow>
+            <asp:TableRow>
+                <asp:TableCell ID="drInf"></asp:TableCell><asp:TableCell ID="drCount"></asp:TableCell>
+                <asp:TableCell ID="drMiddle"></asp:TableCell><asp:TableCell ID="drXML"></asp:TableCell>
+            </asp:TableRow>
+        </asp:Table>
     </div>
     <style type="text/css">
         table th, table td {
@@ -102,13 +130,4 @@
 
         }
     </style>
-    <script>
-        $(document).ready(function () {
-            $("#<%= newIdInput.ClientID%>").attr('readonly', true);
-            $("#<%= addOrd.ClientID%>").attr('disabled', true);
-        });
-    </script>
-    <script>
-        $(document).change()
-    </script>
 </asp:Content>
