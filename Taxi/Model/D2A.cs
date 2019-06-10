@@ -9,12 +9,13 @@ namespace Taxi.Model
 {
 	public class D2A
 	{
-		public Car		Audo;
+		public int		Id;
+		public Car		Auto;
 		public Driver	Driver;
 
 		public override string ToString()
 		{
-			return $"{Audo.Mark} {Audo.Model} - {Driver.Name}";
+			return $"{Auto.Mark} {Auto.Model} - {Driver.Name}";
 		}
 	}
 }

@@ -11,8 +11,8 @@
                 </tr>
                 </thead>
                 <tr>
-                <td><asp:DropDownList runat="server" ID="newActionType">
-                            <asp:ListItem Value="1">Создать</asp:ListItem>
+                <td><asp:DropDownList runat="server" ID="newActionType" >
+                            <asp:ListItem Value="1">Создать </asp:ListItem>
                             <asp:ListItem Value="2">Редактировать</asp:ListItem>
                         </asp:DropDownList></td>
                 <td><asp:TextBox runat="server"  ID="newIdInput"></asp:TextBox></td>
@@ -69,7 +69,7 @@
                     <tr>
                         
                         <td><%= order.Id %></td><td><%= order.Customer.ToString("<br>") %></td><td><%= order?.Car?.ToString("<br>") %></td>
-                        <td><%= order?.Driver?.ToString("<br>") %></td><td><%= order.Way.ToString("<br>") %></td><td><%= order.Date.Date.ToString() %></td>
+                        <td><%= order?.Driver?.ToString("<br>") %></td><td><%= order.Way.ToString("<br>") %></td><td><%= order.Date.ToShortDateString() %></td>
                     
                       
                         </tr>
@@ -102,4 +102,13 @@
 
         }
     </style>
+    <script>
+        $(document).ready(function () {
+            $("#<%= newIdInput.ClientID%>").attr('readonly', true);
+            $("#<%= addOrd.ClientID%>").attr('disabled', true);
+        });
+    </script>
+    <script>
+        $(document).change()
+    </script>
 </asp:Content>

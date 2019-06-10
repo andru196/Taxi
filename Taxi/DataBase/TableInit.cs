@@ -39,8 +39,41 @@ namespace Taxi.DataBase
 			table.Columns.Add(new DataColumn("Id"));
 			table.Columns.Add(new DataColumn("Mark"));
 			table.Columns.Add(new DataColumn("Model"));
+			table.Columns.Add(new DataColumn("Comfort"));
 			return table;
 		}
+
+		public static DataTable CustomerInit()
+		{
+			var table = new DataTable("Customer");
+			table.Columns.Add(new DataColumn("Phone"));
+			table.Columns.Add(new DataColumn("Name"));
+
+
+			return table;
+
+
+		}
+
+		public static DataTable DriversInit()
+		{
+			var table = new DataTable("Driver");
+			table.Columns.Add(new DataColumn("FullName"));
+			table.Columns.Add(new DataColumn("id"));
+			table.Columns.Add(new DataColumn("Phone"));
+			table.Columns.Add(new DataColumn("docXml"));
+			return table;
+		}
+
+		public static DataTable AddressInit()
+		{
+			var table = new DataTable("address");
+			table.Columns.Add(new DataColumn("Id"));
+			table.Columns.Add(new DataColumn("street"));
+			return table;
+
+		}
+		#region
 
 		public static Car CarGetRow(DataRow dr)
 		{
@@ -48,7 +81,8 @@ namespace Taxi.DataBase
 			{
 				Id = int.Parse(dr["Id"].ToString()),
 				Mark = dr["Mark"].ToString(),
-				Model = dr["Model"].ToString()
+				Model = dr["Model"].ToString(),
+				comfLevel =(int.Parse(dr["Comfort"].ToString())) == 1 ? Comfort.Base : ((int.Parse(dr["Comfort"].ToString())) == 2 ? Comfort.Comfort : Comfort.Business)
 			};
 			return newcar;
 		}
@@ -61,6 +95,41 @@ namespace Taxi.DataBase
 			table.Columns.Add(new DataColumn("Model"));
 			table.Columns.Add(new DataColumn("FullName"));
 			return table;
+		}
+
+
+		public static Driver DriverGetRow(DataRow dr)
+        {
+            Driver newDriver = new Driver()
+            {
+                Name = dr["FullName"].ToString(),
+                Id = int.Parse(dr["id"].ToString()),
+                Phone = dr["Phone"].ToString(),
+                xml = dr["docXml"].ToString()
+            };
+            return newDriver;
+        }
+
+		public static Address AddressGetRow(DataRow dr)
+		{
+			Address newAddress = new Address()
+			{
+				street = dr["street"].ToString(),
+				id = int.Parse(dr["Id"].ToString())
+			};
+			return newAddress;
+
+
+		}
+
+		public static Customer CustomerGetRow(DataRow dr)
+		{
+			Customer newCustomer = new Customer()
+			{
+				Phone = dr["Phone"].ToString(),
+				Name = dr["Name"].ToString()
+			};
+			return newCustomer;
 		}
 
 		public static (int, string) d2aGetRow(DataRow dataRow)
@@ -119,6 +188,10 @@ namespace Taxi.DataBase
 
 			return newRow;
 		}
+
+		#endregion
+
+
 
 
 	}
