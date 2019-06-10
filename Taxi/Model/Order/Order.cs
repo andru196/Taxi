@@ -36,5 +36,6 @@ namespace Taxi.Model.Order
 			this.Driver = d;
 			this.Date = dt;
 		}
+		public Order(){ }
 	}
 }

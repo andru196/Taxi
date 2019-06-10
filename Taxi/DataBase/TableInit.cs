@@ -33,7 +33,25 @@ namespace Taxi.DataBase
 			return table;
 		}
 
+		public static DataTable	AutoInit()
+		{
+			var table = new DataTable("Autos");
+			table.Columns.Add(new DataColumn("Id"));
+			table.Columns.Add(new DataColumn("Mark"));
+			table.Columns.Add(new DataColumn("Model"));
+			return table;
+		}
 
+		public static Car CarGetRow(DataRow dr)
+		{
+			Car newcar = new Car()
+			{
+				Id = int.Parse(dr["Id"].ToString()),
+				Mark = dr["Mark"].ToString(),
+				Model = dr["Model"].ToString()
+			};
+			return newcar;
+		}
 		public static DataTable DaylyDrivers()
 		{
 			var table = new DataTable("D2A");
@@ -88,6 +106,20 @@ namespace Taxi.DataBase
 			Order neworder = new Order(int.Parse(dataRow["Id"].ToString()), Price, newway, newcar, newcust, newdriver, dt);
 			return neworder;
 		}
+
+		public static DataRow OrderAddRow(DataTable dataTable, Order ord)
+		{
+			DataRow newRow = dataTable.NewRow();
+			newRow["Id"] = ord.Id;
+			newRow["Price"] = ord.Price;
+			newRow["From"] = ord.Way.From;
+			newRow["To"] = ord.Way.To;
+			newRow["Customer Phone"] = ord.Customer.Phone;
+			newRow["CUstomer Name"] = ord.Customer.Name;
+
+			return newRow;
+		}
+
 
 	}
 }
