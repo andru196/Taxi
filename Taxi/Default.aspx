@@ -6,15 +6,15 @@
             $("#<%= addOrd.ClientID%>").attr('disabled', true);
         });
             function checkParams() {
-                var From = $('#MainContent_newFrom').val();
-                var To = $('#MainContent_newTo').val();
-                var phone = $('#MainContent_newPhone').val();
-                var name = $('#MainContent_newName').val();
+                var From = $('#<%= newFrom.ClientID%>').val();
+                var To = $('#<%= newTo.ClientID %>').val();
+                var phone = $('#<% = newPhone.ClientID%>').val();
+                var name = $('#<%= newName.ClientID %>').val();
 
                 if (name.length != 0 && From.length != 0 && phone.length != 0 && To.length != 0) {
-                    $('#MainContent_addOrd').removeAttr('disabled');
+                    $('#<% = addOrd.ClientID %>').removeAttr('disabled');
                 } else {
-                    $('#MainContent_addOrd').attr('disabled', 'disabled');
+                    $('#<% = addOrd.ClientID %>').attr('disabled', 'disabled');
                 }
             }
     </script>
@@ -51,6 +51,13 @@
                  <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newPhone"></asp:TextBox></td>
                  <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newName"></asp:TextBox></td>
                 <td><asp:Button runat="server" Text="Сохранить" OnClick="btnAddNewOrder" ID="addOrd"/></td>
+            </tr>
+            <tr>
+                <td colspan="3"> <asp:TextBox  onkeyup="checkParams()" TextMode="MultiLine" Columns="90" Rows="6" ID="newExtra" runat="server"></asp:TextBox></td>
+                <td colspan="2">           
+                        <asp:DropDownList runat="server" ID="newRadio">
+                           
+                        </asp:DropDownList></td>
             </tr>
         </table>
         <br />

@@ -12,6 +12,8 @@ using System.Xml.Linq;
 using Taxi.DataBase;
 using Taxi.Model;
 using Taxi.Model.Person;
+using System.Data.Linq;
+using System.Xml;
 
 namespace Taxi
 {
@@ -21,12 +23,12 @@ namespace Taxi
 		/// Список заказов
 		/// </summary>
 		protected List<Order> ordList = new List<Order>();
-		protected List<(int, string)> d2a_List = new List<(int, string)>();
 		protected List<Driver> driverList = new List<Driver>();
 		protected List<Customer> custList = new List<Customer>();
 		protected List<Car> carList = new List<Car>();
 		protected List<Address> adList = new List<Address>();
 		protected List<D2A> d2aList = new List<D2A>();
+		protected List<RadioStation> rsList;
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
@@ -44,12 +46,17 @@ namespace Taxi
 			d2aList = d2aList.Where(x => x.Date == DateTime.Today).ToList();
 			foreach (var da2el in d2aList)
 				newd2a.Items.Insert(0, new ListItem(da2el.ToString(), da2el.Id.ToString()));
+			int i = 1;
+			newRadio.Items.Insert(0, new ListItem("Не важно", "0"));
+			foreach (var rs in rsList)
+				newRadio.Items.Insert(i++, new ListItem(rs.Name, rs.ID.ToString()));
 		}
 
 
 
 		private void fillLists(int take, int skip)
 		{
+			var connectionString = ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString;
 			using (var adapter = new SqlDataAdapter())
 			{
 				//инициируем таблицу-представление
@@ -57,7 +64,7 @@ namespace Taxi
 				
 
 				//инициировать строку запроса               
-				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Drivers" ,ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString);
+				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Drivers" , connectionString);
 
 				adapter.Fill(Table);
 
@@ -67,31 +74,31 @@ namespace Taxi
 				}
 
 				Table = TableInit.CustomerInit();
-				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Customer", ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString);
+				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Customer", connectionString);
 				adapter.Fill(Table);
 				foreach (DataRow row in Table.Rows)
 					custList.Add(TableInit.CustomerGetRow(row));
 
 				Table = TableInit.AddressInit();
-				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Address", ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString);
+				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Address", connectionString);
 				adapter.Fill(Table);
 				foreach (DataRow row in Table.Rows)
 					adList.Add(TableInit.AddressGetRow(row));
 
 				Table = TableInit.AutoInit();
-				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Auto", ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString);
+				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Auto", connectionString);
 				adapter.Fill(Table);
 				foreach (DataRow row in Table.Rows)
 					carList.Add(TableInit.CarGetRow(row));
 
 				Table = TableInit.D2AInit();
-				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Drivers2Auto", ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString);
+				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Drivers2Auto", connectionString);
 				adapter.Fill(Table);
 				foreach (DataRow row in Table.Rows)
 					d2aList.Add(TableInit.D2AGetRow(row, carList, driverList));
 
 				Table = TableInit.OrderInit();
-				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Orders", ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString);
+				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Orders", connectionString);
 				adapter.Fill(Table);
 				foreach (DataRow row in Table.Rows)
 					ordList.Add(TableInit.OrderGetRow(row, d2aList, adList, custList));
@@ -103,14 +110,9 @@ namespace Taxi
 				//	.Take(take)
 				//	.ToList();
 			}
-			using (var adapter = new SqlDataAdapter())
-			{
-				var d2aTable = TableInit.DaylyDrivers();
-				adapter.SelectCommand = QueryGenerator.DaylyDriversGenerateSelectQuery(ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString);
-				adapter.Fill(d2aTable);
-				foreach (DataRow row in d2aTable.Rows)
-					d2a_List.Add(TableInit.d2aGetRow(row));
-			}
+			//Ещё можно так:
+			DataContext db = new DataContext(connectionString);
+			 rsList = db.GetTable<RadioStation>().ToList();
 		}
 		// Реакция на нажатия
 		#region
@@ -143,8 +145,8 @@ namespace Taxi
 				drInf.Text = dr.ToString();
 				int count = buf.Count();
 				drCount.Text = count.ToString();
-				drMiddle.Text = ((double)count / (double)buf.GroupBy(x => x.d2a.Date).Count()).ToString();
-
+				drMiddle.Text = string.Format("{0:f2}", (double)count / (double)buf.GroupBy(x => x.d2a.Date).Count());
+				drXML.Text = dr.xml;
 
 				btnFilter.Text = "Применить фильтр - " + drCount.Text;
 			}
@@ -157,14 +159,20 @@ namespace Taxi
 				int d2aId, price;
 				int.TryParse(newd2a.SelectedValue, out d2aId);
 				int.TryParse(newPrice.Text, out price);
+				XmlDocument xDoc = new XmlDocument();
+				xDoc.AppendChild(xDoc.CreateElement("for_driver"));
+				xDoc.SelectSingleNode("for_driver").AppendChild(xDoc.CreateElement("radio"));
+				xDoc.SelectSingleNode("for_driver/radio").AppendChild(xDoc.CreateTextNode(rsList.Where(x => x.ID == int.Parse(newRadio.SelectedValue)).First().Name));
+				xDoc.SelectSingleNode("for_driver").AppendChild(xDoc.CreateElement("extra_info"));
+				xDoc.SelectSingleNode("for_driver/extra_info").AppendChild(xDoc.CreateTextNode(newExtra.Text));
 				var newOrd = new Order()
 				{
 					d2a = d2aList.Where(a => a.Id == d2aId).FirstOrDefault(),
 					Price = price,
 					Customer = new Customer()
 					{ Name = newName.Text, Phone = newPhone.Text },
-					Way = new Way(newFrom.Text, newTo.Text)
-					
+					Way = new Way(newFrom.Text, newTo.Text),
+					xml = xDoc.InnerXml
 				};
 
 				addOrdToDb(newOrd);

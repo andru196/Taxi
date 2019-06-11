@@ -53,6 +53,8 @@ namespace Taxi.DataBase
 			SqlParameter param = new SqlParameter("@price", SqlDbType.Money);
 			param.SourceColumn = "Price";
 			sqlCommand.Parameters.Add(param);
+			sqlCommand.Parameters.Add("@for_driver", SqlDbType.Xml, 0, "for_driver");
+
 
 			return sqlCommand;
 		}

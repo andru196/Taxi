@@ -76,7 +76,7 @@ namespace Taxi.DataBase
 			table.Columns.Add(new DataColumn("FullName"));
 			table.Columns.Add(new DataColumn("id"));
 			table.Columns.Add(new DataColumn("Phone"));
-			table.Columns.Add(new DataColumn("docXml"));
+			table.Columns.Add(new DataColumn("docsXml"));
 			return table;
 		}
 
@@ -131,7 +131,7 @@ namespace Taxi.DataBase
                 Name = dr["FullName"].ToString(),
                 Id = int.Parse(dr["id"].ToString()),
                 Phone = dr["Phone"].ToString(),
-                xml = dr["docXml"].ToString()
+                xml = dr["docsXml"].ToString()
             };
             return newDriver;
         }

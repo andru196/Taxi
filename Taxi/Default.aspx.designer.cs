@@ -94,6 +94,24 @@ namespace Taxi {
         protected global::System.Web.UI.WebControls.Button addOrd;
         
         /// <summary>
+        /// newExtra элемент управления.
+        /// </summary>
+        /// <remarks>
+        /// Автоматически создаваемое поле.
+        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox newExtra;
+        
+        /// <summary>
+        /// newRadio элемент управления.
+        /// </summary>
+        /// <remarks>
+        /// Автоматически создаваемое поле.
+        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList newRadio;
+        
+        /// <summary>
         /// fltName элемент управления.
         /// </summary>
         /// <remarks>
