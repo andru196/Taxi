@@ -31,7 +31,7 @@
                 <tr>
                 <td><asp:DropDownList runat="server" ID="newActionType" >
                             <asp:ListItem Value="1">Создать </asp:ListItem>
-                            <asp:ListItem Value="2">Редактировать</asp:ListItem>
+                            <asp:ListItem Value="2">Не сегодня</asp:ListItem>
                         </asp:DropDownList></td>
                 <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newIdInput"></asp:TextBox></td>
                 <td colspan="2">           
