@@ -31,7 +31,7 @@
                 <tr>
                 <td><asp:DropDownList runat="server" ID="newActionType" >
                             <asp:ListItem Value="1">Создать </asp:ListItem>
-                            <asp:ListItem Value="2">Не сегодня</asp:ListItem>
+                            <asp:ListItem Value="2">Редактировать</asp:ListItem>
                         </asp:DropDownList></td>
                 <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newIdInput"></asp:TextBox></td>
                 <td colspan="2">           
@@ -46,8 +46,8 @@
                 </tr>
             </thead>
             <tr>
-                 <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newFrom"></asp:TextBox></td>
-                 <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newTo"></asp:TextBox></td>
+                 <td><asp:DropDownList runat="server" ID="newFrom">  </asp:DropDownList></td>
+                 <td><asp:DropDownList runat="server" ID="newTo">  </asp:DropDownList></td>
                  <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newPhone"></asp:TextBox></td>
                  <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newName"></asp:TextBox></td>
                 <td><asp:Button runat="server" Text="Сохранить" OnClick="btnAddNewOrder" ID="addOrd"/></td>

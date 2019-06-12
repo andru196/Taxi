@@ -55,7 +55,7 @@ namespace Taxi {
         /// Автоматически создаваемое поле.
         /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox newFrom;
+        protected global::System.Web.UI.WebControls.DropDownList newFrom;
         
         /// <summary>
         /// newTo элемент управления.
@@ -64,7 +64,7 @@ namespace Taxi {
         /// Автоматически создаваемое поле.
         /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox newTo;
+        protected global::System.Web.UI.WebControls.DropDownList newTo;
         
         /// <summary>
         /// newPhone элемент управления.

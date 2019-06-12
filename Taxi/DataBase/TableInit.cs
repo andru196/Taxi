@@ -11,6 +11,8 @@ namespace Taxi.DataBase
 {
 	public class TableInit
 	{
+		public delegate DataTable Init();
+		public delegate T GetRow<T>(DataRow dr);
 		/// <summary>
 		/// Инициализация таблицы-представления для списка заказов
 		/// </summary>
@@ -55,6 +57,15 @@ namespace Taxi.DataBase
 			table.Columns.Add(new DataColumn("Mark"));
 			table.Columns.Add(new DataColumn("Model"));
 			table.Columns.Add(new DataColumn("Comfortable"));
+			return table;
+		}
+
+		public static DataTable WayInit()
+		{
+			var table = new DataTable("Id");
+			table.Columns.Add(new DataColumn("from"));
+			table.Columns.Add(new DataColumn("to"));
+			table.Columns.Add(new DataColumn("distance"));
 			return table;
 		}
 
@@ -159,6 +170,19 @@ namespace Taxi.DataBase
 			return newCustomer;
 		}
 
+
+		public static Way WayGetRow(DataRow dr, List<Address> al)
+		{
+			Way newWay = new Way()
+			{
+				Id = int.Parse(dr["Id"].ToString()),
+				From = al.Where( x => x.id == int.Parse(dr["from"].ToString())).First(),
+				To = al.Where(x => x.id == int.Parse(dr["to"].ToString())).First(),
+				Distance = int.Parse(dr["distance"].ToString())
+			};
+			return newWay;
+		}
+
 		public static (int, string) d2aGetRow(DataRow dataRow)
 		{
 			string s;
@@ -239,8 +263,8 @@ namespace Taxi.DataBase
 			DataRow newRow = dataTable.NewRow();
 			newRow["D2A"] = ord.d2a.Id;
 			newRow["Price"] = ord.Price;
-			newRow["AdressFrom"] = ord.Way.From.street;
-			newRow["AdressTo"] = ord.Way.To.street;
+			newRow["AdressFrom"] = ord.Way.From.id;
+			newRow["AdressTo"] = ord.Way.To.id;
 			newRow["Phone"] = ord.Customer.Phone;
 			newRow["Customer Name"] = ord.Customer.Name;
 			newRow["for_driver"] = ord.xml;

@@ -29,6 +29,7 @@ namespace Taxi
 		protected List<Address> adList = new List<Address>();
 		protected List<D2A> d2aList = new List<D2A>();
 		protected List<RadioStation> rsList;
+		protected List<Way> wayList = new List<Way>();
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
@@ -36,62 +37,60 @@ namespace Taxi
 			{
 				//начальный запрос страницы
 				fillLists(10, 0);
+				d2aList = d2aList.Where(x => x.Date == DateTime.Today).ToList();
+				foreach (var da2el in d2aList)
+					newd2a.Items.Insert(0, new ListItem(da2el.ToString(), da2el.Id.ToString()));
+				int i = 0;
+				rsList.Add(new RadioStation()
+				{
+					Name = "Не важно",
+					ID = 0
+				});
+				foreach (var rs in rsList)
+					newRadio.Items.Insert(i++, new ListItem(rs.Name, rs.ID.ToString()));
+				i = 0;
+				foreach (var a in adList)
+				{
+					newFrom.Items.Insert(i, new ListItem(a.street, a.id.ToString()));
+					newTo.Items.Insert(i++, new ListItem(a.street, a.id.ToString()));
+				}
 				//hdnCurrentPage.Value = "0";
 			}
 			else
 			{
-				fillLists(10, 0);
+				
 			}
 
-			d2aList = d2aList.Where(x => x.Date == DateTime.Today).ToList();
-			foreach (var da2el in d2aList)
-				newd2a.Items.Insert(0, new ListItem(da2el.ToString(), da2el.Id.ToString()));
-			int i = 1;
-			newRadio.Items.Insert(0, new ListItem("Не важно", "0"));
-			foreach (var rs in rsList)
-				newRadio.Items.Insert(i++, new ListItem(rs.Name, rs.ID.ToString()));
+			
 		}
 
+
+		
 
 
 		private void fillLists(int take, int skip)
 		{
+			void littleFiller<cl>(TableInit.Init a, TableInit.GetRow<cl> b, List<cl> lst, string c, SqlDataAdapter adapter, string connectionString1)
+			{
+				var Table = a();
+				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery(c, connectionString1);
+				adapter.Fill(Table);
+				foreach (DataRow row in Table.Rows)
+				{
+					lst.Add(b(row));
+				}
+			}
 			var connectionString = ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString;
 			using (var adapter = new SqlDataAdapter())
 			{
 				//инициируем таблицу-представление
-				var Table = TableInit.DriversInit();
-				
 
-				//инициировать строку запроса               
-				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Drivers" , connectionString);
+				littleFiller(TableInit.DriversInit, TableInit.DriverGetRow, driverList, "Drivers", adapter, connectionString);
+				littleFiller(TableInit.CustomerInit, TableInit.CustomerGetRow, custList, "Customer", adapter, connectionString);
+				littleFiller(TableInit.AddressInit, TableInit.AddressGetRow, adList, "Address order by street", adapter, connectionString);
+				littleFiller(TableInit.AutoInit, TableInit.CarGetRow, carList, "Auto", adapter, connectionString);
 
-				adapter.Fill(Table);
-
-				foreach (DataRow row in Table.Rows)
-				{
-					driverList.Add(TableInit.DriverGetRow(row));
-				}
-
-				Table = TableInit.CustomerInit();
-				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Customer", connectionString);
-				adapter.Fill(Table);
-				foreach (DataRow row in Table.Rows)
-					custList.Add(TableInit.CustomerGetRow(row));
-
-				Table = TableInit.AddressInit();
-				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Address", connectionString);
-				adapter.Fill(Table);
-				foreach (DataRow row in Table.Rows)
-					adList.Add(TableInit.AddressGetRow(row));
-
-				Table = TableInit.AutoInit();
-				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Auto", connectionString);
-				adapter.Fill(Table);
-				foreach (DataRow row in Table.Rows)
-					carList.Add(TableInit.CarGetRow(row));
-
-				Table = TableInit.D2AInit();
+				var Table = TableInit.D2AInit();
 				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Drivers2Auto", connectionString);
 				adapter.Fill(Table);
 				foreach (DataRow row in Table.Rows)
@@ -104,6 +103,11 @@ namespace Taxi
 					ordList.Add(TableInit.OrderGetRow(row, d2aList, adList, custList));
 
 
+				Table = TableInit.WayInit();
+				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Metrics", connectionString);
+				adapter.Fill(Table);
+				foreach (DataRow row in Table.Rows)
+					wayList.Add(TableInit.WayGetRow(row, adList));
 
 				//ordList = ordList
 				//	.Skip(skip)
@@ -122,7 +126,7 @@ namespace Taxi
 			var byf = driverList.AsEnumerable();
 
 			if (!string.IsNullOrEmpty(fltName.Text))
-				byf = byf.Where(x => x.Name.Contains(fltName.Text));
+				byf = byf.Where(x => x.Name.ToLower().Contains(fltName.Text.ToLower()));
 
 			if (!string.IsNullOrEmpty(fltPhone.Text))
 				byf = byf.Where(x => x.Phone.Contains(fltPhone.Text));
@@ -159,21 +163,37 @@ namespace Taxi
 				int d2aId, price;
 				int.TryParse(newd2a.SelectedValue, out d2aId);
 				int.TryParse(newPrice.Text, out price);
+
 				XmlDocument xDoc = new XmlDocument();
 				xDoc.AppendChild(xDoc.CreateElement("for_driver"));
 				xDoc.SelectSingleNode("for_driver").AppendChild(xDoc.CreateElement("radio"));
 				xDoc.SelectSingleNode("for_driver/radio").AppendChild(xDoc.CreateTextNode(rsList.Where(x => x.ID == int.Parse(newRadio.SelectedValue)).First().Name));
 				xDoc.SelectSingleNode("for_driver").AppendChild(xDoc.CreateElement("extra_info"));
 				xDoc.SelectSingleNode("for_driver/extra_info").AppendChild(xDoc.CreateTextNode(newExtra.Text));
+
 				var newOrd = new Order()
 				{
 					d2a = d2aList.Where(a => a.Id == d2aId).FirstOrDefault(),
-					Price = price,
 					Customer = new Customer()
-					{ Name = newName.Text, Phone = newPhone.Text },
-					Way = new Way(newFrom.Text, newTo.Text),
+					{ Name = newName.Text.ToLower(), Phone = newPhone.Text },
+					Way = new Way( adList.Where(x => x.id.ToString() == newFrom.SelectedValue).First(), adList.Where(x => x.id.ToString() == newTo.SelectedValue).First()),
 					xml = xDoc.InnerXml
 				};
+				newOrd.Way.Distance = Way.DistCount(newOrd.Way.From, newOrd.Way.To, wayList);
+				//price += newOrd.Way.Distance;
+				switch (newOrd.d2a.Auto.comfLevel)
+				{
+					case Comfort.Base:
+						price += price * newOrd.Way.Distance * 1 / 10;
+						break;
+					case Comfort.Comfort:
+						price += price * newOrd.Way.Distance * 2 / 10;
+						break;
+					case Comfort.Business:
+						price += price * newOrd.Way.Distance * 5 / 10;
+						break;
+				}
+				newOrd.Price = price;
 
 				addOrdToDb(newOrd);
 			}
