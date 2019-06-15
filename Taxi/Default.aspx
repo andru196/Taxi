@@ -29,11 +29,16 @@
                 </tr>
                 </thead>
                 <tr>
-                <td><asp:DropDownList runat="server" ID="newActionType" >
+                <td><asp:DropDownList runat="server" ID="newActionType" OnSelectedIndexChanged="selActionType" AutoPostBack="true">
                             <asp:ListItem Value="1">Создать </asp:ListItem>
                             <asp:ListItem Value="2">Редактировать</asp:ListItem>
                         </asp:DropDownList></td>
-                <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newIdInput"></asp:TextBox></td>
+                <td><asp:TextBox runat="server" onkeyup="checkParams()"    ID="newIdInput">
+                    </asp:TextBox>
+                    <asp:DropDownList runat="server" Visible="false" OnSelectedIndexChanged="selId" AutoPostBack="true" ID="newId">
+                           
+                        </asp:DropDownList></td>
+                </td>
                 <td colspan="2">           
                         <asp:DropDownList runat="server" ID="newd2a">
                            
@@ -48,8 +53,8 @@
             <tr>
                  <td><asp:DropDownList runat="server" ID="newFrom">  </asp:DropDownList></td>
                  <td><asp:DropDownList runat="server" ID="newTo">  </asp:DropDownList></td>
-                 <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newPhone"></asp:TextBox></td>
-                 <td><asp:TextBox runat="server" onkeyup="checkParams()"  ID="newName"></asp:TextBox></td>
+                 <td><asp:TextBox runat="server" onkeyup="checkParams()" TextMode="Phone" ID="newPhone"></asp:TextBox></td>
+                 <td><asp:TextBox runat="server" onkeyup="checkParams()" ID="newName"></asp:TextBox></td>
                 <td><asp:Button runat="server" Text="Сохранить" OnClick="btnAddNewOrder" ID="addOrd"/></td>
             </tr>
             <tr>

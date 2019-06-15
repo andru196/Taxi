@@ -31,6 +31,15 @@ namespace Taxi {
         protected global::System.Web.UI.WebControls.TextBox newIdInput;
         
         /// <summary>
+        /// newId элемент управления.
+        /// </summary>
+        /// <remarks>
+        /// Автоматически создаваемое поле.
+        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList newId;
+        
+        /// <summary>
         /// newd2a элемент управления.
         /// </summary>
         /// <remarks>

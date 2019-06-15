@@ -258,6 +258,9 @@ namespace Taxi.DataBase
 			return newd2a;
 		}
 
+
+		#endregion
+
 		public static DataRow OrderAddRow(DataTable dataTable, Order ord)
 		{
 			DataRow newRow = dataTable.NewRow();
@@ -268,13 +271,20 @@ namespace Taxi.DataBase
 			newRow["Phone"] = ord.Customer.Phone;
 			newRow["Customer Name"] = ord.Customer.Name;
 			newRow["for_driver"] = ord.xml;
+			if (ord.Id != 0)
+				newRow["Id"] = ord.Id;
 			return newRow;
 		}
 
-		#endregion
 
+		public static DataRow D2AAddRow(DataTable dataTable, D2A d2a)
+		{
+			DataRow newRow = dataTable.NewRow();
+			newRow["driver"] = d2a.Driver.Id;
+			newRow["Auto"] = d2a.Auto.Id;
 
-
+			return newRow;
+		}
 
 	}
 }

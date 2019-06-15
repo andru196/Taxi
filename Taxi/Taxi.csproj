@@ -124,6 +124,7 @@
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Insert D2A.aspx" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
@@ -161,6 +162,7 @@
   <ItemGroup>
     <Compile Include="App_Start\BundleConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
+    <Compile Include="DataBase\Class1.cs" />
     <Compile Include="DataBase\QueryGenerator.cs" />
     <Compile Include="DataBase\TableInit.cs" />
     <Compile Include="Default.aspx.cs">
@@ -172,6 +174,13 @@
     </Compile>
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
+    </Compile>
+    <Compile Include="Insert D2A.aspx.cs">
+      <DependentUpon>Insert D2A.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Insert D2A.aspx.designer.cs">
+      <DependentUpon>Insert D2A.aspx</DependentUpon>
     </Compile>
     <Compile Include="Model\Address.cs" />
     <Compile Include="Model\Car.cs" />

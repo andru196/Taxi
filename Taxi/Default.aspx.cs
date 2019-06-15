@@ -23,23 +23,26 @@ namespace Taxi
 		/// Список заказов
 		/// </summary>
 		protected List<Order> ordList = new List<Order>();
-		protected List<Driver> driverList = new List<Driver>();
 		protected List<Customer> custList = new List<Customer>();
-		protected List<Car> carList = new List<Car>();
-		protected List<Address> adList = new List<Address>();
+		protected List<Driver> driverList;
+		protected List<Car> carList;
+		protected List<Address> adList;
 		protected List<D2A> d2aList = new List<D2A>();
 		protected List<RadioStation> rsList;
 		protected List<Way> wayList = new List<Way>();
 
 		protected void Page_Load(object sender, EventArgs e)
 		{
+			fillLists(10, 0);
 			if (!IsPostBack)
-			{
-				//начальный запрос страницы
-				fillLists(10, 0);
-				d2aList = d2aList.Where(x => x.Date == DateTime.Today).ToList();
-				foreach (var da2el in d2aList)
-					newd2a.Items.Insert(0, new ListItem(da2el.ToString(), da2el.Id.ToString()));
+			{				
+				var d2al = d2aList.Where(x => x.Date == DateTime.Today).ToList();
+				
+				if (d2al.Count() == 0)
+					Response.Write("<script>window.alert('Ух-ты, похоже сегодня нет работающих водителей!\nСкорее отправь их на работу:\n\tперейди по ссылке выше');</script>");
+				else
+					foreach (var da2el in d2al)
+						newd2a.Items.Insert(0, new ListItem(da2el.ToString(), da2el.Id.ToString()));
 				int i = 0;
 				rsList.Add(new RadioStation()
 				{
@@ -65,9 +68,11 @@ namespace Taxi
 		}
 
 
-		
-
-
+		/// <summary>
+		/// Заполняем списки разными способами
+		/// </summary>
+		/// <param name="take"></param>
+		/// <param name="skip"></param>
 		private void fillLists(int take, int skip)
 		{
 			void littleFiller<cl>(TableInit.Init a, TableInit.GetRow<cl> b, List<cl> lst, string c, SqlDataAdapter adapter, string connectionString1)
@@ -83,20 +88,15 @@ namespace Taxi
 			var connectionString = ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString;
 			using (var adapter = new SqlDataAdapter())
 			{
-				//инициируем таблицу-представление
-
-				littleFiller(TableInit.DriversInit, TableInit.DriverGetRow, driverList, "Drivers", adapter, connectionString);
 				littleFiller(TableInit.CustomerInit, TableInit.CustomerGetRow, custList, "Customer", adapter, connectionString);
-				littleFiller(TableInit.AddressInit, TableInit.AddressGetRow, adList, "Address order by street", adapter, connectionString);
-				littleFiller(TableInit.AutoInit, TableInit.CarGetRow, carList, "Auto", adapter, connectionString);
 
-				var Table = TableInit.D2AInit();
-				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Drivers2Auto", connectionString);
-				adapter.Fill(Table);
-				foreach (DataRow row in Table.Rows)
-					d2aList.Add(TableInit.D2AGetRow(row, carList, driverList));
+				driverList = Driver.GetDrivers(connectionString, adapter);
+				adList = Address.GetAddresses(connectionString, adapter);
+				carList = Car.GetCars(connectionString, adapter);
 
-				Table = TableInit.OrderInit();
+				d2aList = D2A.GetD2As(connectionString, adapter, carList, driverList);
+
+				var Table = TableInit.OrderInit();
 				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Orders", connectionString);
 				adapter.Fill(Table);
 				foreach (DataRow row in Table.Rows)
@@ -158,64 +158,131 @@ namespace Taxi
 
 		protected void btnAddNewOrder(object sender, EventArgs e)
 		{
+			
+			int d2aId, price, id;
+			int.TryParse(newd2a.SelectedValue, out d2aId);
+			int.TryParse(newPrice.Text, out price);
+			int.TryParse(newId.SelectedValue, out id);
+			XmlDocument xDoc = new XmlDocument();
+			xDoc.AppendChild(xDoc.CreateElement("for_driver"));
+			xDoc.SelectSingleNode("for_driver").AppendChild(xDoc.CreateElement("radio"));
+			xDoc.SelectSingleNode("for_driver/radio").AppendChild(xDoc.CreateTextNode(rsList.Where(x => x.ID == int.Parse(newRadio.SelectedValue)).First().Name));
+			xDoc.SelectSingleNode("for_driver").AppendChild(xDoc.CreateElement("extra_info"));
+			xDoc.SelectSingleNode("for_driver/extra_info").AppendChild(xDoc.CreateTextNode(newExtra.Text));
+
+			var newOrd = new Order()
+			{
+				Id = id,
+				d2a = d2aList.Where(a => a.Id == d2aId).FirstOrDefault(),
+				Customer = new Customer()
+				{ Name = newName.Text == "" ? "user" : newName.Text.ToLower(), Phone = newPhone.Text },
+				Way = new Way( adList.Where(x => x.id.ToString() == newFrom.SelectedValue).First(), adList.Where(x => x.id.ToString() == newTo.SelectedValue).First()),
+				xml = xDoc.InnerXml
+			};
+			newOrd.Way.Distance = Way.DistCount(newOrd.Way.From, newOrd.Way.To, wayList);
+			//price += newOrd.Way.Distance;
+			switch (newOrd.d2a.Auto.comfLevel)
+			{
+				case Comfort.Base:
+					price += price * newOrd.Way.Distance * 1 / 10;
+					break;
+				case Comfort.Comfort:
+					price += price * newOrd.Way.Distance * 2 / 10;
+					break;
+				case Comfort.Business:
+					price += price * newOrd.Way.Distance * 5 / 10;
+					break;
+			}
+				newOrd.Price = price;
+			if (newActionType.SelectedValue == "1")
+				addOrdToDb(newOrd, QueryGenerator.OrderGenerateUpdateQuery, UpdateType.Insert);
+			else
+				addOrdToDb(newOrd, QueryGenerator.OrderGenerateUpdateQuery, UpdateType.Update); 
+		}
+
+
+		protected void selActionType(object sender, EventArgs e)
+		{
 			if (newActionType.SelectedValue == "1")
 			{
-				int d2aId, price;
-				int.TryParse(newd2a.SelectedValue, out d2aId);
-				int.TryParse(newPrice.Text, out price);
+				newIdInput.Visible = true;
+				newId.Visible = false;
+				newId.Items.Clear();
+				newd2a.Items.Clear();
+				var d2al = d2aList.Where(x => x.Date == DateTime.Today).ToList();
 
-				XmlDocument xDoc = new XmlDocument();
-				xDoc.AppendChild(xDoc.CreateElement("for_driver"));
-				xDoc.SelectSingleNode("for_driver").AppendChild(xDoc.CreateElement("radio"));
-				xDoc.SelectSingleNode("for_driver/radio").AppendChild(xDoc.CreateTextNode(rsList.Where(x => x.ID == int.Parse(newRadio.SelectedValue)).First().Name));
-				xDoc.SelectSingleNode("for_driver").AppendChild(xDoc.CreateElement("extra_info"));
-				xDoc.SelectSingleNode("for_driver/extra_info").AppendChild(xDoc.CreateTextNode(newExtra.Text));
+				if (d2al.Count() == 0)
+					Response.Write("<script>window.alert('Ух-ты, похоже сегодня нет работающих водителей!\nСкорее отправь их на работу:\n\tперейди по ссылке выше');</script>");
+				else
+					foreach (var da2el in d2al)
+						newd2a.Items.Insert(0, new ListItem(da2el.ToString(), da2el.Id.ToString()));
 
-				var newOrd = new Order()
-				{
-					d2a = d2aList.Where(a => a.Id == d2aId).FirstOrDefault(),
-					Customer = new Customer()
-					{ Name = newName.Text.ToLower(), Phone = newPhone.Text },
-					Way = new Way( adList.Where(x => x.id.ToString() == newFrom.SelectedValue).First(), adList.Where(x => x.id.ToString() == newTo.SelectedValue).First()),
-					xml = xDoc.InnerXml
-				};
-				newOrd.Way.Distance = Way.DistCount(newOrd.Way.From, newOrd.Way.To, wayList);
-				//price += newOrd.Way.Distance;
-				switch (newOrd.d2a.Auto.comfLevel)
-				{
-					case Comfort.Base:
-						price += price * newOrd.Way.Distance * 1 / 10;
-						break;
-					case Comfort.Comfort:
-						price += price * newOrd.Way.Distance * 2 / 10;
-						break;
-					case Comfort.Business:
-						price += price * newOrd.Way.Distance * 5 / 10;
-						break;
-				}
-				newOrd.Price = price;
-
-				addOrdToDb(newOrd);
+			}
+			else
+			{
+				newId.Visible = true;
+				newIdInput.Visible = false;
+				
+				var orders = ordList.OrderBy(o => o.d2a.Date);
+				foreach (Order or in orders)
+					newId.Items.Add(new ListItem($"{or.d2a.Date.ToShortDateString()} - от {or.Customer.Phone} - вёз {or.d2a.Driver.Name}", or.Id.ToString()));
 			}
 		}
+
+
+		protected void selId(object sender, EventArgs e)
+		{
+			int choise = int.Parse(newId.SelectedValue);
+			Order or = ordList.Where(o => o.Id == choise).First();
+			newd2a.Items.Clear();
+			var d2al = d2aList.Where(d2a => d2a.Date == or.d2a.Date);
+
+			foreach (D2A d2a in d2al)
+				newd2a.Items.Add(new ListItem($"{d2a.Date.ToShortDateString()} {d2a.Driver.Name} {d2a.Auto.Mark}", d2a.Id.ToString()));
+			newd2a.SelectedValue = or.d2a.Id.ToString();
+			newFrom.SelectedValue = or.Way.From.id.ToString();
+			newTo.SelectedValue = or.Way.To.id.ToString();
+			newPhone.Text = or.Customer.Phone;
+			newName.Text = or.Customer.Name;
+			newPrice.Text = or.Price.ToString();
+			XmlDocument xm = new XmlDocument();
+			xm.LoadXml(or.xml);
+			string radio = xm.SelectSingleNode("for_driver/radio").InnerText;
+			newRadio.SelectedValue = rsList.Where(r => r.Name == radio).First().ID.ToString();
+		}
+
+
+
+
 
 		#endregion
 
 		// Обработка
 		#region
 
-		protected void addOrdToDb(Order ord)
+		protected void addOrdToDb(Order ord, QueryGenerator.SomeSqlCommand sqc, UpdateType flag)
 		{
 			using (var adapter = new SqlDataAdapter())
 			{
+				string connectionString = ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString;
 				//инициируем таблицу-представление
 				var ordTable = TableInit.OrderInit();
 				//генерация новой записи
 				var newRow = TableInit.OrderAddRow(ordTable, ord);
 				ordTable.Rows.Add(newRow);
+				// Проверим, есть ли в таблице данный пользователь
+				if (flag == UpdateType.Update)
+				{
+					if (custList.Where(c => c.Phone == ord.Customer.Phone).Count() == 0)
+					{
+						DataContext db = new DataContext(connectionString);
+						db.GetTable<Customer>().InsertOnSubmit(ord.Customer);
+						db.SubmitChanges();
+					}
+				}
 				//инициировать строку запроса               
-				adapter.InsertCommand = QueryGenerator.OrderGenerateInsertQuery(ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString);
 
+				adapter.InsertCommand = sqc(connectionString, flag);
 				adapter.Update(ordTable);
 			}
 		}

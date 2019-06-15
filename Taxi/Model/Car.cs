@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Web;
+using Taxi.DataBase;
 
 namespace Taxi.Model
 {
@@ -18,6 +21,23 @@ namespace Taxi.Model
 		public string ToString(string s)
 		{
 			return $"{Mark} {Model}{s}Уровнеь комфорта: {comfLevel}";
+		}
+		/// <summary>
+		/// Возвращает список автомобилей из БД
+		/// </summary>
+		/// <param name="connectionString">Строка соединения</param>
+		/// <param name="adapter">SqlDataAdapter</param>
+		/// <returns></returns>
+		public static List<Car> GetCars(string connectionString, SqlDataAdapter adapter)
+		{
+			List<Car> lc = new List<Car>();
+			DataTable Table = TableInit.AutoInit();
+
+			adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("auto", connectionString);
+			adapter.Fill(Table);
+			foreach (DataRow row in Table.Rows)
+				lc.Add(TableInit.CarGetRow(row));
+			return (lc);
 		}
 	}
 
