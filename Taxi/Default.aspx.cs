@@ -39,7 +39,7 @@ namespace Taxi
 				var d2al = d2aList.Where(x => x.Date == DateTime.Today).ToList();
 				
 				if (d2al.Count() == 0)
-					Response.Write("<script>window.alert('Ух-ты, похоже сегодня нет работающих водителей!\nСкорее отправь их на работу:\n\tперейди по ссылке выше');</script>");
+					Response.Write("<script>window.alert('Ух-ты, похоже сегодня нет работающих водителей!\\"+"nСкорее отправь их на работу:\\"+"n  перейди по ссылке выше');</script>");
 				else
 					foreach (var da2el in d2al)
 						newd2a.Items.Insert(0, new ListItem(da2el.ToString(), da2el.Id.ToString()));

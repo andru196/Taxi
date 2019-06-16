@@ -16,7 +16,7 @@
                 } else {
                     $('#<% = addOrd.ClientID %>').attr('disabled', 'disabled');
                 }
-            }
+            }  
     </script>
     <div class="jumbotron">
 
@@ -36,7 +36,6 @@
                 <td><asp:TextBox runat="server" onkeyup="checkParams()"    ID="newIdInput">
                     </asp:TextBox>
                     <asp:DropDownList runat="server" Visible="false" OnSelectedIndexChanged="selId" AutoPostBack="true" ID="newId">
-                           
                         </asp:DropDownList></td>
                 </td>
                 <td colspan="2">           
@@ -79,14 +78,18 @@
                 <td><asp:Button runat="server" id="btnFilter" Text ="Применить фильтр" CssClass="btn btn-primary" OnClick="btnFilter_Click"/></td>
             </tr>
         </table>
-                        
+        <script>
+            function EditOrd(a) {
+                if ($("#<%= newActionType.ClientID %>").val() == 2) {
+                    $("#<%= newId.ClientID %>").val(a.childNodes[1].innerHTML).trigger('change');
+                }
+            }
+        </script>      
         <table class="ordlist">
             <thead>
                 <tr>
                     <th>№</th><th>Заказчик</th><th>Машина</th>
-                    <th>Водитель</th><th>Маршрут</th><th>Дата заказа
-
-                                                     </th>
+                    <th>Водитель</th><th>Маршрут</th><th>Дата заказа</th><th>Сумма</th>
                 </tr>
             </thead>
             <tbody>
@@ -96,10 +99,10 @@
                     {
                         
                 %>
-                    <tr>
+                    <tr onclick="EditOrd(this)">
                         
                         <td><%= order.Id %></td><td><%= order.Customer.ToString("<br>") %></td><td><%= order?.d2a.Auto?.ToString("<br>") %></td>
-                        <td><%= order?.d2a?.Driver?.ToString("<br>") %></td><td><%= order.Way.ToString("<br>") %></td><td><%= order?.d2a.Date.ToShortDateString() %></td>
+                        <td><%= order?.d2a?.Driver?.ToString("<br>") %></td><td><%= order.Way.ToString("<br>") %></td><td><%= order?.d2a.Date.ToShortDateString() %></td><td><%= order?.Price.ToString() %></td>
                     
                       
                         </tr>
@@ -135,11 +138,15 @@
           text-align: left;
           vertical-align: middle; }
 
-        .ordlist td, .ordlist th{
-          border-color: #c1c2c1;
-          border-style: solid;
-          border-width: 1px; 
-
+        .ordlist td, .ordlist th {
+            border-color: #c1c2c1;
+            border-style: solid;
+            border-width: 1px;
         }
+        .ordlist tr:hover{
+            background-color: aliceblue;
+        }
+
+   
     </style>
 </asp:Content>
