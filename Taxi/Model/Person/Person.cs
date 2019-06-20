@@ -7,9 +7,9 @@ namespace Taxi.Model.Person
 {
 	public class Person
 	{
-		public int		Id;
-		public string	Phone;
-		public string	Name;
+		public int Id;
+		public string Phone;
+		public string Name;
 
 		public override string ToString()
 		{

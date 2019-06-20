@@ -10,10 +10,10 @@ namespace Taxi.Model
 {
 	public class Car
 	{
-		public int		Id;
-		public string	Mark;
-		public string	Model;
-		public Comfort	comfLevel;
+		public int Id;
+		public string Mark;
+		public string Model;
+		public Comfort comfLevel;
 		public override string ToString()
 		{
 			return $"{Mark} {Model}\nУровнеь комфорта:\t{comfLevel}";

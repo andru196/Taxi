@@ -157,6 +157,24 @@ namespace Taxi {
         protected global::System.Web.UI.WebControls.Button btnFilter;
         
         /// <summary>
+        /// prevButton элемент управления.
+        /// </summary>
+        /// <remarks>
+        /// Автоматически создаваемое поле.
+        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button prevButton;
+        
+        /// <summary>
+        /// newxtButton элемент управления.
+        /// </summary>
+        /// <remarks>
+        /// Автоматически создаваемое поле.
+        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button newxtButton;
+        
+        /// <summary>
         /// tbl_footer элемент управления.
         /// </summary>
         /// <remarks>
@@ -200,5 +218,23 @@ namespace Taxi {
         /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TableCell drXML;
+        
+        /// <summary>
+        /// sortType элемент управления.
+        /// </summary>
+        /// <remarks>
+        /// Автоматически создаваемое поле.
+        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField sortType;
+        
+        /// <summary>
+        /// selPage элемент управления.
+        /// </summary>
+        /// <remarks>
+        /// Автоматически создаваемое поле.
+        /// Для изменения переместите объявление поля из файла конструктора в файл кода программной части.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.HiddenField selPage;
     }
 }

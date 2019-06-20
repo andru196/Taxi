@@ -8,9 +8,9 @@ namespace Taxi.Model
 	public class Way
 	{
 		public int Id;
-		public Address	From;
-		public Address	To;
-		public int		Distance;
+		public Address From;
+		public Address To;
+		public int Distance;
 
 		public static int DistCount(Address from, Address to,List<Way> lw, List<Address> localAddress = null, int count = 0, int minDistance = 0)
 		{

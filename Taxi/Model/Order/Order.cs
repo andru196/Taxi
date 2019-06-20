@@ -9,29 +9,28 @@ namespace Taxi.Model.Order
 {
 	public class Order
 	{
-		public int					Id;
-		public D2A 					d2a;
-		public Customer				Customer;
-		public Way					Way;
-		public decimal				Price;
-		public string				xml;
+		public int Id;
+		public D2A d2a;
+		public Customer Customer;
+		public Way Way;
+		public decimal Price;
+		public string xml;
 		/// <summary>
 		/// Конструктор экземпляра заказа
 		/// </summary>
-		/// <param name="i">ID заказа</param>
-		/// <param name="p">Сумма заказа</param>
-		/// <param name="w">Экземпляр класса пути</param>
-		/// <param name="c">Экземпляр класса автомобиля</param>
-		/// <param name="cu">Экземпляр класса заказчик</param>
-		/// <param name="d">Экземпляр класса водитель</param>
-		/// <param name="dt">Дата заказа</param>
-		public Order(int i, decimal p, Way w,  Customer cu, D2A d2, string x = "")
+		/// <param name="ID">ID заказа</param>
+		/// <param name="price">Сумма заказа</param>
+		/// <param name="way">Экземпляр класса пути</param>
+		/// <param name="customer">Экземпляр класса заказчик</param>
+		/// <param name="d2a">Экземпляр класса водитель</param>
+		/// <param name="x">xml заказа</param>
+		public Order(int ID, decimal price, Way way,  Customer customer, D2A d2a, string x = "")
 		{
-			this.Id = i;
-			this.Price = p;
-			this.Way = w;
-			this.d2a = d2;
-			this.Customer = cu;
+			this.Id = ID;
+			this.Price = price;
+			this.Way = way;
+			this.d2a = d2a;
+			this.Customer = customer;
 			this.xml = x;
 		}
 		public Order(){ }

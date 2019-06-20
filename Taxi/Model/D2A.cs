@@ -12,9 +12,9 @@ namespace Taxi.Model
 {
 	public class D2A
 	{
-		public int		Id;
-		public Car		Auto;
-		public Driver	Driver;
+		public int Id;
+		public Car Auto;
+		public Driver Driver;
 		public DateTime Date;
 
 		public static List<D2A> GetD2As(string connectionString, SqlDataAdapter adapter, List<Car> carList, List<Driver> driverList)

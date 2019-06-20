@@ -35,12 +35,14 @@ namespace Taxi
 		{
 			fillLists(10, 0);
 			if (!IsPostBack)
-			{				
+			{
+				selPage.Value = "0";
+				//Выбираем сегодняшних работников
 				var d2al = d2aList.Where(x => x.Date == DateTime.Today).ToList();
 				
 				if (d2al.Count() == 0)
 					Response.Write("<script>window.alert('Ух-ты, похоже сегодня нет работающих водителей!\\"+"nСкорее отправь их на работу:\\"+"n  перейди по ссылке выше');</script>");
-				else
+				else		//Заполняем выпадающий список
 					foreach (var da2el in d2al)
 						newd2a.Items.Insert(0, new ListItem(da2el.ToString(), da2el.Id.ToString()));
 				int i = 0;
@@ -49,6 +51,7 @@ namespace Taxi
 					Name = "Не важно",
 					ID = 0
 				});
+				rsList.OrderBy(x => x.ID);
 				foreach (var rs in rsList)
 					newRadio.Items.Insert(i++, new ListItem(rs.Name, rs.ID.ToString()));
 				i = 0;
@@ -57,7 +60,6 @@ namespace Taxi
 					newFrom.Items.Insert(i, new ListItem(a.street, a.id.ToString()));
 					newTo.Items.Insert(i++, new ListItem(a.street, a.id.ToString()));
 				}
-				//hdnCurrentPage.Value = "0";
 			}
 			else
 			{
@@ -88,14 +90,15 @@ namespace Taxi
 			var connectionString = ConfigurationManager.ConnectionStrings["tpDb"].ConnectionString;
 			using (var adapter = new SqlDataAdapter())
 			{
+				//Используя специальную функцию
 				littleFiller(TableInit.CustomerInit, TableInit.CustomerGetRow, custList, "Customer", adapter, connectionString);
-
+				//Испольхуя встроенные методы
 				driverList = Driver.GetDrivers(connectionString, adapter);
 				adList = Address.GetAddresses(connectionString, adapter);
 				carList = Car.GetCars(connectionString, adapter);
 
 				d2aList = D2A.GetD2As(connectionString, adapter, carList, driverList);
-
+				//Ещё 1 метод
 				var Table = TableInit.OrderInit();
 				adapter.SelectCommand = QueryGenerator.GenerateSelectQuery("Orders", connectionString);
 				adapter.Fill(Table);
@@ -109,18 +112,47 @@ namespace Taxi
 				foreach (DataRow row in Table.Rows)
 					wayList.Add(TableInit.WayGetRow(row, adList));
 
-				//ordList = ordList
-				//	.Skip(skip)
-				//	.Take(take)
-				//	.ToList();
+				//Сортировка
+				switch (sortType.Value)
+				{
+					case "2":
+						ordList = ordList.OrderBy(o => o.Customer.Name).ToList();
+						break;
+					case "3":
+						ordList = ordList.OrderBy(o => o.d2a.Auto.Mark).ToList();
+						break;
+					case "4":
+						ordList = ordList.OrderBy(o => o.d2a.Driver.Name).ToList();
+						break;
+					case "5":
+						ordList = ordList.OrderBy(o => o.Way.From.street).ToList();
+						break;
+					case "6":
+						ordList = ordList.OrderBy(o => o.d2a.Date).ToList();
+						break;
+					case "7":
+						ordList = ordList.OrderBy(o => o.Price).ToList();
+						break;
+					default:
+						break;
+				}
+				ordList = ordList
+					.Skip(skip)
+					.Take(take)
+					.ToList();
 			}
-			//Ещё можно так:
+			//Используя LINQ-To-SQL
 			DataContext db = new DataContext(connectionString);
 			 rsList = db.GetTable<RadioStation>().ToList();
 		}
 		// Реакция на нажатия
 		#region
-
+		
+			/// <summary>
+			/// Фильтруем заказы по введённым данным
+			/// </summary>
+			/// <param name="sender"></param>
+			/// <param name="e"></param>
 		protected void btnFilter_Click(object sender, EventArgs e)
 		{
 			var byf = driverList.AsEnumerable();
@@ -155,7 +187,7 @@ namespace Taxi
 				btnFilter.Text = "Применить фильтр - " + drCount.Text;
 			}
 		}
-
+		//Собираем заказ из введённых данных
 		protected void btnAddNewOrder(object sender, EventArgs e)
 		{
 			
@@ -200,7 +232,7 @@ namespace Taxi
 				addOrdToDb(newOrd, QueryGenerator.OrderGenerateUpdateQuery, UpdateType.Update); 
 		}
 
-
+		//Ракция на изменения типа действия
 		protected void selActionType(object sender, EventArgs e)
 		{
 			if (newActionType.SelectedValue == "1")
@@ -229,7 +261,7 @@ namespace Taxi
 			}
 		}
 
-
+		//Выбран заказ для редактирования
 		protected void selId(object sender, EventArgs e)
 		{
 			int choise = int.Parse(newId.SelectedValue);
@@ -251,7 +283,54 @@ namespace Taxi
 			newRadio.SelectedValue = rsList.Where(r => r.Name == radio).First().ID.ToString();
 		}
 
+		protected void btnNext_Click(object sender, EventArgs e)
+		{
+			var currentPage = int.Parse(selPage.Value);
+			currentPage++;
+			selPage.Value = currentPage.ToString();
 
+			fillLists(10, currentPage * 10);
+		}
+		protected void btnPrev_Click(object sender, EventArgs e)
+		{
+			var currentPage = int.Parse(selPage.Value);
+			if (currentPage > 0)
+				currentPage--;
+			selPage.Value = currentPage.ToString();
+
+			fillLists(10, currentPage * 10);
+		}
+
+		protected void btnSort_Click(object sender, EventArgs e)
+		{
+			string type = "1";
+			switch (((Button)sender).Text)
+			{
+				case "№":
+					type = "1";
+					break;
+				case "Заказчик":
+					type = "2";
+					break;
+				case "Машина":
+					type = "3";
+					break;
+				case "Водитель":
+					type = "4";
+					break;
+				case "Маршрут":
+					type = "5";
+					break;
+				case "Дата заказа":
+					type = "6";
+					break;
+				case "Сумма":
+					type = "7";
+					break;
+			}
+			sortType.Value = type;
+			//fillLists(10, 0);
+		}
 
 
 
@@ -259,7 +338,12 @@ namespace Taxi
 
 		// Обработка
 		#region
-
+		/// <summary>
+		/// Добавляем заказ в БД
+		/// </summary>
+		/// <param name="ord"></param>
+		/// <param name="sqc"></param>
+		/// <param name="flag"></param>
 		protected void addOrdToDb(Order ord, QueryGenerator.SomeSqlCommand sqc, UpdateType flag)
 		{
 			using (var adapter = new SqlDataAdapter())

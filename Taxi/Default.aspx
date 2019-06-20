@@ -19,7 +19,7 @@
             }  
     </script>
     <div class="jumbotron">
-
+        
 
         <table>
             <thead>
@@ -75,7 +75,7 @@
                 <td><asp:TextBox runat="server"  ID="fltName"></asp:TextBox></td>
                 <td><asp:TextBox runat="server"  ID="fltPhone"></asp:TextBox></td>
                 <td><asp:TextBox runat="server"  ID="fltDoc"></asp:TextBox></td>
-                <td><asp:Button runat="server" id="btnFilter" Text ="Применить фильтр" CssClass="btn btn-primary" OnClick="btnFilter_Click"/></td>
+                <td><asp:Button runat="server"   id="btnFilter" Text ="Применить фильтр" CssClass="btn btn-primary" OnClick="btnFilter_Click"/></td>
             </tr>
         </table>
         <script>
@@ -88,8 +88,10 @@
         <table class="ordlist">
             <thead>
                 <tr>
-                    <th>№</th><th>Заказчик</th><th>Машина</th>
-                    <th>Водитель</th><th>Маршрут</th><th>Дата заказа</th><th>Сумма</th>
+                    <th><asp:Button Text="№" runat="server" OnClick="btnSort_Click"/></th><th><asp:Button Text="Заказчик" OnClick="btnSort_Click" runat="server"/></th>
+                    <th><asp:Button Text="Машина" runat="server" OnClick="btnSort_Click"/></th><th><asp:Button Text="Водитель" runat="server" OnClick="btnSort_Click"/></th>
+                    <th><asp:Button Text="Маршрут" runat="server" OnClick="btnSort_Click"/></th><th><asp:Button Text="Дата заказа" runat="server" OnClick="btnSort_Click"/></th>
+                    <th><asp:Button Text="Сумма" runat="server" OnClick="btnSort_Click"/></th>
                 </tr>
             </thead>
             <tbody>
@@ -111,6 +113,7 @@
                     }
                 %>
             </tbody>
+            <asp:Button Text="Назад" runat="server" ID="prevButton" OnClick="btnPrev_Click"/> <asp:Button Text="Вперёд" runat="server" ID="newxtButton" OnClick="btnNext_Click"/>
         </table>
         <asp:Table id="tbl_footer" runat="server" Visible="false" >
             <asp:TableRow>
@@ -146,7 +149,7 @@
         .ordlist tr:hover{
             background-color: aliceblue;
         }
-
-   
     </style>
+    <asp:HiddenField runat="server" ID="sortType"/>
+    <asp:HiddenField runat="server" ID="selPage"/>
 </asp:Content>
